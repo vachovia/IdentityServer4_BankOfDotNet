@@ -1,9 +1,28 @@
 ﻿using IdentityServer4.Models;
+using IdentityServer4.Test;
 
 namespace BankOfDotNet.IdentityServer.ServerConfiguration
 {
     public class Config
     {
+        public static List<TestUser> GetUsers()
+        {
+            return new List<TestUser>() {
+                new TestUser()
+                {
+                    SubjectId = "1",
+                    Username = "Test",
+                    Password = "P@ssword1",
+                },
+                new TestUser()
+                {
+                    SubjectId = "2",
+                    Username = "Bob",
+                    Password = "P@ssword1",
+                }
+            };
+        }
+
         public static IEnumerable<ApiResource> GetAllApiResources()
         {
             var apiResources = new List<ApiResource> {
@@ -31,7 +50,16 @@ namespace BankOfDotNet.IdentityServer.ServerConfiguration
             {
                 new Client() {
                     ClientId = "vlad",
-                    AllowedGrantTypes = GrantTypes.ClientCredentials, // server to server when there is a trust
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    ClientSecrets = new List<Secret>
+                    {
+                        new Secret("secret".Sha256()) // { Value = "secret".Sha256()}
+                    },
+                    AllowedScopes = { "bankOfDotNetApi" }
+                },
+                new Client() {
+                    ClientId = "petrosyan",
+                    AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
                     ClientSecrets = new List<Secret>
                     {
                         new Secret("secret".Sha256()) // { Value = "secret".Sha256()}

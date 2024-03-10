@@ -8,7 +8,8 @@ builder.Services.AddIdentityServer()
     .AddDeveloperSigningCredential()
     .AddInMemoryApiScopes(Config.GetApiScopes())
     .AddInMemoryApiResources(Config.GetAllApiResources())
-    .AddInMemoryClients(Config.GetClients());
+    .AddInMemoryClients(Config.GetClients())
+    .AddTestUsers(Config.GetUsers());
 
 builder.Services.AddControllers();
 
