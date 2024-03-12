@@ -1,10 +1,20 @@
-﻿using IdentityServer4.Models;
+﻿using IdentityServer4;
+using IdentityServer4.Models;
 using IdentityServer4.Test;
 
 namespace BankOfDotNet.IdentityServer.ServerConfiguration
 {
     public class Config
     {
+        public static IEnumerable<IdentityResource> GetIdentityResources()
+        {
+            return new List<IdentityResource>()
+            {
+                new IdentityResources.OpenId(),
+                new IdentityResources.Profile()
+            };
+        }
+
         public static List<TestUser> GetUsers()
         {
             return new List<TestUser>() {
@@ -40,7 +50,9 @@ namespace BankOfDotNet.IdentityServer.ServerConfiguration
         {
             return new List<ApiScope>
              {
-                 new ApiScope("bankOfDotNetApi")
+                 new ApiScope("bankOfDotNetApi"),
+                 //new ApiScope(IdentityServerConstants.StandardScopes.OpenId),
+                 //new ApiScope(IdentityServerConstants.StandardScopes.Profile)
              };
         }
 
@@ -65,6 +77,22 @@ namespace BankOfDotNet.IdentityServer.ServerConfiguration
                         new Secret("secret".Sha256()) // { Value = "secret".Sha256()}
                     },
                     AllowedScopes = { "bankOfDotNetApi" }
+                },
+                new Client() {
+                    ClientId = "mvc",
+                    ClientName = "Mvc Client",
+                    AllowedGrantTypes = GrantTypes.Implicit,
+                    RedirectUris = {"https://localhost:7002/signin-oidc"},
+                    PostLogoutRedirectUris = { "https://localhost:7002/signout-callback-oidc" },
+                    ClientSecrets = new List<Secret>
+                    {
+                        new Secret("secret".Sha256()) // { Value = "secret".Sha256()}
+                    },
+                    AllowedScopes = new List<string>
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile
+                    }
                 }
             };
 

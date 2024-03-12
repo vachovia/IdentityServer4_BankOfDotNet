@@ -1,0 +1,19 @@
+﻿
+@{
+    ViewData["Title"] = "Secure";
+}
+
+<h2>Secure</h2>
+
+<h5>User Claims</h5>
+
+<dl>
+    @{
+        int x = 0;
+        foreach(var claim in User.Claims)
+        {
+            x++;
+            <dt>@x) @claim.Type - @claim.Value</dt>
+        }
+    }
+</dl>
