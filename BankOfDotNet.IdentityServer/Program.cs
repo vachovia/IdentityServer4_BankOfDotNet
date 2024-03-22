@@ -1,38 +1,66 @@
-using BankOfDotNet.IdentityServer.ServerConfiguration;
+using BankOfDotNet.IdentityServer.Data;
+using BankOfDotNet.IdentityServer.SeedData;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// builder.Services.AddMvc() // both are added
+var assembly = typeof(Program).Assembly.GetName().Name;
+var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
+
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseSqlServer(dbConnectionString);
+});
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequiredLength = 8;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    // options.SignIn.RequireConfirmedEmail = true;
+}).AddEntityFrameworkStores<AppDbContext>();
+
+
+
 builder.Services.AddIdentityServer()
-    .AddDeveloperSigningCredential()
-    .AddInMemoryIdentityResources(Config.GetIdentityResources()) // for implicit flow
-    .AddInMemoryApiScopes(Config.GetApiScopes())
-    .AddInMemoryApiResources(Config.GetAllApiResources())
-    .AddInMemoryClients(Config.GetClients())
-    .AddTestUsers(Config.GetUsers());
+    .AddTestUsers(Config.GetUsers())
+    //.AddAspNetIdentity<IdentityUser>()    
+    .AddConfigurationStore(options =>
+    { // clients and resources
+        options.ConfigureDbContext = b => b.UseSqlServer(
+            dbConnectionString,
+            opt => opt.MigrationsAssembly(assembly)
+        );
+    })    
+    .AddOperationalStore(options =>
+    { // tokens, consents, codes etc.
+        options.ConfigureDbContext = b => b.UseSqlServer(
+            dbConnectionString,
+            opt => opt.MigrationsAssembly(assembly)
+        );
+    }).AddDeveloperSigningCredential();
 
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 
-// Added
 app.UseRouting();
 
 app.UseIdentityServer();
 app.UseAuthorization();
 
-// app.MapControllers(); // Replaced by this
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllers();
+
+// app.EnsureSeedData();
 
 app.Run();
