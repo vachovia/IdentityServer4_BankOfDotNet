@@ -8,6 +8,24 @@
 //    .AddInMemoryClients(Config.GetClients)
 //    .AddTestUsers(Config.GetUsers());
 
+//builder.Services.AddIdentityServer()
+//    .AddTestUsers(Config.GetUsers())
+//    //.AddAspNetIdentity<IdentityUser>()    
+//    .AddConfigurationStore(options =>
+//    { // clients and resources
+//        options.ConfigureDbContext = b => b.UseSqlServer(
+//            dbConnectionString,
+//            opt => opt.MigrationsAssembly(assembly)
+//        );
+//    })
+//    .AddOperationalStore(options =>
+//    { // tokens, consents, codes etc.
+//        options.ConfigureDbContext = b => b.UseSqlServer(
+//            dbConnectionString,
+//            opt => opt.MigrationsAssembly(assembly)
+//        );
+//    }).AddDeveloperSigningCredential();
+
 
 // Add-Migration InitialIdentityServerMigration -c PersistedGrantDbContext => Update-Database -Context PersistedGrantDbContext
 // Added two tables: DeviceCodes and PesistedGrants

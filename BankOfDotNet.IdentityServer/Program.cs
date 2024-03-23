@@ -25,20 +25,18 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     // options.SignIn.RequireConfirmedEmail = true;
 }).AddEntityFrameworkStores<AppDbContext>();
 
-
-
 builder.Services.AddIdentityServer()
     .AddTestUsers(Config.GetUsers())
     //.AddAspNetIdentity<IdentityUser>()    
     .AddConfigurationStore(options =>
-    { // clients and resources
+    {
         options.ConfigureDbContext = b => b.UseSqlServer(
             dbConnectionString,
             opt => opt.MigrationsAssembly(assembly)
         );
-    })    
+    })
     .AddOperationalStore(options =>
-    { // tokens, consents, codes etc.
+    {
         options.ConfigureDbContext = b => b.UseSqlServer(
             dbConnectionString,
             opt => opt.MigrationsAssembly(assembly)
@@ -59,7 +57,10 @@ app.UseRouting();
 app.UseIdentityServer();
 app.UseAuthorization();
 
-app.MapControllers();
+// app.MapControllers(); // Replaced by this !!!
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 // app.EnsureSeedData();
 
